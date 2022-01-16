@@ -8,6 +8,7 @@
         id, user_id, title, content, type, status, create_time, comment_count, score
     </sql>
 
+<!-- 分页获取帖子 -->
     <select id="selectDiscussPosts" resultType="com.nowcoder.community.entity.DiscussPost">
         select <include refid="selectFields"></include>
         from discuss_post
@@ -19,6 +20,7 @@
         limit #{offset}, #{limit}
     </select>
 
+<!--    获取帖子总数 -->
     <select id="selectDiscussPostRows" resultType="int">
         select count(id)
         from discuss_post
