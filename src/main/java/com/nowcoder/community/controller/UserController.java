@@ -64,7 +64,7 @@ public class UserController {
 
     /**
      * 上传用户头像
-     * @param headerImage
+     * @param headerImage 上传文件类型
      * @param model
      * @return
      */
@@ -87,7 +87,7 @@ public class UserController {
 
         // 生成随机文件名
         fileName = CommunityUtil.generateUUID() + suffix;
-        // 确定文件存放的路径
+        // 确定文件存放的路径，这里先存到服务器上
         File dest = new File(uploadPath + "/" + fileName);
         try {
             // 存储文件 (可以检查uploadPath是否存在, 否则创建该目录)
@@ -99,9 +99,9 @@ public class UserController {
 
         // 更新当前用户头像的路径(web访问路径)
         // http://localhost:8083/community/user/header/xxx.png
-        User user = hostHolder.getUser();
+        User user = hostHolder.getUser(); // 得到当前用户
         String headerUrl = domain + contextPath + "/user/header/" + fileName;
-        userService.updateHeader(user.getId(), headerUrl);
+        userService.updateHeader(user.getId(), headerUrl); // 更新数据库
 
         return "redirect:/index";
     }
@@ -132,7 +132,7 @@ public class UserController {
              // 游标
              int b = 0;
              // 读取文件
-             while ((b = fis.read(buffer)) != -1) { // 读到b个字节的数据, 最大1024个字节
+             while ((b = fis.read(buffer)) != -1) { // 读到b个字节的数据, 最大1024个字节，未读到文件末尾
                  // 输出
                  os.write(buffer, 0, b);
              }
@@ -158,9 +158,9 @@ public class UserController {
 
     /**
      * 更新用户密码
-     * @param oldPassword
-     * @param newPassword
-     * @param confirmPassword
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @param confirmPassword 确认密码
      * @param model
      * @return
      */

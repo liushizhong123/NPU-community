@@ -5,10 +5,24 @@
 <mapper namespace="com.nowcoder.community.dao.DiscussPostMapper">
 
     <sql id="selectFields">
-        id, user_id, title, content, type, status, create_time, comment_count, score
+        id, user_id, title, content,type, status, create_time, comment_count, score
     </sql>
 
-<!-- 分页获取帖子 -->
+    <sql id="insertFields">
+        user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <!--  插入帖子数据 -->
+    <insert id="insertDiscussPost" parameterType="com.nowcoder.community.entity.DiscussPost" keyProperty="id">
+        insert into discuss_post(<include refid="insertFields"></include>)
+        values (#{userId}, #{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score})
+    </insert>
+<!--    更新帖子评论数量 -->
+    <update id="updateCommentCount">
+        update discuss_post set comment_count = #{commentCount} where id = #{id}
+    </update>
+
+    <!-- 分页获取帖子 -->
     <select id="selectDiscussPosts" resultType="com.nowcoder.community.entity.DiscussPost">
         select <include refid="selectFields"></include>
         from discuss_post
@@ -28,6 +42,13 @@
         <if test="userId!=0">
             and user_id = #{userId}
         </if>
+    </select>
+
+<!--    获取帖子详情 -->
+    <select id="selectDiscussPostById" resultType="com.nowcoder.community.entity.DiscussPost">
+        select  <include refid="selectFields"></include>
+        from discuss_post
+        where id = #{id}
     </select>
 
 </mapper>

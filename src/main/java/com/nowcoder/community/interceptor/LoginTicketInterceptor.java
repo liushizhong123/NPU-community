@@ -56,12 +56,13 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
                 hostHolder.setUser(user);
             }
         }
-        return true;
+//        System.out.println("111111111");
+        return true; // 允许执行方法
     }
 
     /**
      * 在Controller之后执行
-     * 在模板引擎之前使用user, 存入modelAndView
+     * 在模板引擎之前使用 user, 存入modelAndView
      * @param request
      * @param response
      * @param handler
@@ -75,11 +76,12 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         if(user != null && modelAndView != null){
             modelAndView.addObject("loginUser",user);
         }
+//        System.out.println("2222222222");
     }
 
     /**
      * 在模板引擎之后执行
-     * 整个请求结束时, 清除user.
+     * 整个请求结束时, 清除 user.
      * @param request
      * @param response
      * @param handler
@@ -90,5 +92,6 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
         hostHolder.clear();
+//        System.out.println("33333333333333");
     }
 }

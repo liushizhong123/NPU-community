@@ -1,7 +1,7 @@
 package com.nowcoder.community.util;
 
 /**
- * 激活工具类
+ * 变量工具类
  */
 public interface CommunityConstant {
     /**
@@ -18,12 +18,22 @@ public interface CommunityConstant {
     int ACTIVATION_FAILURE = 2;
 
     /**
-     * 默认状态的登录凭证的超时时间 12小时
+     * 默认状态的登录凭证的超时时间 12 小时
      */
     int DEFAULT_EXPIRED_SECONDS = 3600 * 12;
 
     /**
-     * 记住状态下的登录凭证超时时间 10天
+     * 记住我状态下的登录凭证超时时间 7 天
      */
-    int REMEMBER_EXPIRED_SECONDS = 3600 * 24 * 10;
+    int REMEMBER_EXPIRED_SECONDS = 3600 * 24 * 7;
+
+    /**
+     * 实体类型 ：帖子
+     */
+    int ENTITY_TYPE_POST = 1;
+
+    /**
+     * 实体类型 ：帖子
+     */
+    int ENTITY_TYPE_COMMENT = 2;
 }

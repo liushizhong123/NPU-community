@@ -13,10 +13,12 @@ import java.util.UUID;
  * @author lsz on 2022/1/13
  */
 public class CommunityUtil {
+
     // 随机生成字符串
     public static String generateUUID(){
         return UUID.randomUUID().toString().replaceAll("-","");
     }
+
     // MD5 加密
     public static String md5(String key){
         if(StringUtils.isBlank(key)){
@@ -26,7 +28,7 @@ public class CommunityUtil {
     }
 
     /**
-     * json转换
+     * 转换json字符串
      * @param code
      * @param msg
      * @param map
@@ -41,14 +43,16 @@ public class CommunityUtil {
                 json.put(key, map.get(key));
             }
         }
-        // 转换为Json对象
+        // 转换为Json格式的字符串
         return json.toJSONString();
     }
 
+    // 重载
     public static String getJSONString(int code, String msg) {
         return getJSONString(code, msg, null);
     }
 
+    // 重载
     public static String getJSONString(int code) {
         return getJSONString(code, null, null);
     }

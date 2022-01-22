@@ -110,6 +110,7 @@ public class UserService implements CommunityConstant {
         String content = templateEngine.process("/mail/activation", context);
         mailClient.sendMail(user.getEmail(), "激活账号", content);
         // -------------注册用户结束-----------
+
         return map;
     }
 
@@ -123,7 +124,7 @@ public class UserService implements CommunityConstant {
         User user = userMapper.selectById(userId);
         if (user.getStatus() == 1) {
             // 1 代表已经激活
-            return ACTIVATION_REPEAT;
+            return ACTIVATION_REPEAT; // 重复激活
         } else if (user.getActivationCode().equals(code)) {
             // 相等代表激活码相同即激活成功
             userMapper.updateStatus(userId, 1); // 更改激活状态：0->1
@@ -134,7 +135,7 @@ public class UserService implements CommunityConstant {
     }
 
     /**
-     * 登入功能
+     * 登入功能实现
      * @param username
      * @param password
      * @param expiredSeconds
@@ -179,8 +180,8 @@ public class UserService implements CommunityConstant {
         loginTicket.setUserId(user.getId());
         loginTicket.setTicket(CommunityUtil.generateUUID()); // 生成随机字符串
         loginTicket.setStatus(0); // 有效状态
-        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000)); // 现在的时间加上过期时间
-        // 存入登录凭证
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000)); // 现在的时间加上过期时间（毫秒）
+        // 存入登录凭证到数据库
         loginTicketMapper.insertLoginTicket(loginTicket);
         // 浏览器只需要存 ticket, 通过它可以查询到登录凭证即可
         map.put("ticket", loginTicket.getTicket());
@@ -207,9 +208,10 @@ public class UserService implements CommunityConstant {
 
     /**
      * 更新用户密码
-     * @param userId
-     * @param oldPassword
-     * @param newPassword
+     * @param userId 用户 id
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @param confirmPassword 确认密码
      * @return
      */
     public Map<String,Object> updatePassword(int userId,String oldPassword,String newPassword,String confirmPassword){
@@ -237,7 +239,7 @@ public class UserService implements CommunityConstant {
         User user = userMapper.selectById(userId);
         oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
         if (!user.getPassword().equals(oldPassword)) {
-            map.put("oldPasswordMsg", "原密码输入有误!");
+            map.put("oldPasswordMsg", "原始密码输入有误!");
             return map;
         }
 

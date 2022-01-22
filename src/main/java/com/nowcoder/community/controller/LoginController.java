@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * 登录处理逻辑
+ * 登录注册处理器
  *
  * @author lsz on 2022/1/13
  */
@@ -49,11 +49,11 @@ public class LoginController implements CommunityConstant {
     @Autowired
     private MailClient mailClient;
 
-    // 日志
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+    // 打印日志
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     /**
-     * 定位注册页
+     * 跳转注册页
      * @return
      */
     @GetMapping(value = "/register")
@@ -69,7 +69,7 @@ public class LoginController implements CommunityConstant {
      */
     @PostMapping(value = "/register")
     public String register(Model model, User user) {
-        // 根据返回值map做出响应
+        // 根据返回值 map 做出响应
         Map<String, Object> map = userService.register(user);
         // map是存放错误信息的；若为空，则注册成功！
         if (map == null || map.isEmpty()) {
@@ -87,7 +87,7 @@ public class LoginController implements CommunityConstant {
     }
 
     /**
-     * 定位登入页
+     * 跳转登入页
      * @return
      */
     @GetMapping(value = "/login")
@@ -142,12 +142,13 @@ public class LoginController implements CommunityConstant {
         // 将验证码存入session
         session.setAttribute("kaptcha",text);
         // 输出图片到浏览器
-        response.setContentType("image/png");
+        response.setContentType("image/png"); // 输出格式
         try {
+            // 输出流
             OutputStream os = response.getOutputStream();
             ImageIO.write(image,"png",os);
         } catch (IOException e) {
-            LOGGER.error("响应验证码失败：" + e.getMessage());
+            logger.error("响应验证码失败：" + e.getMessage());
         }
     }
 
@@ -181,6 +182,7 @@ public class LoginController implements CommunityConstant {
         String key = "ticket";
         // 若map里包含ticket，则登录成功，跳转到首页页面
         if (map.containsKey(key)) {
+            // 创建 cookie 给前端
             Cookie cookie = new Cookie(key, map.get(key).toString());
             cookie.setPath(contextPath); // 设置有限范围: 整个项目cookie都有效
             cookie.setMaxAge(expiredSeconds); // 设置有效时间
@@ -195,7 +197,7 @@ public class LoginController implements CommunityConstant {
     }
 
     /**
-     * 忘记密码
+     * 跳转忘记密码页
      * @return
      */
     @GetMapping("/forget")
@@ -239,17 +241,18 @@ public class LoginController implements CommunityConstant {
      * @param session
      * @return
      */
-    @RequestMapping(path = "/forget/password", method = RequestMethod.POST)
+    @PostMapping(value = "/forget/password")
     public String resetPassword(String email, String verifyCode, String password, Model model, HttpSession session) {
-        String code = (String) session.getAttribute("verifyCode");
+        String code = (String) session.getAttribute("verifyCode"); // 获取验证码
         if (StringUtils.isBlank(verifyCode) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(verifyCode)) {
             model.addAttribute("codeMsg", "验证码错误!");
             return "/site/forget";
         }
 
         Map<String, Object> map = userService.resetPassword(email, password);
+        // 重置密码成功
         if (map.containsKey("user")) {
-            return "redirect:/login";
+            return "redirect:/login"; // 重定向到登录页
         } else {
             model.addAttribute("emailMsg", map.get("emailMsg"));
             model.addAttribute("passwordMsg", map.get("passwordMsg"));
