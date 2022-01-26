@@ -1,5 +1,8 @@
 package com.nowcoder.community.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Date;
 
 public class User {
@@ -111,4 +114,41 @@ public class User {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return new EqualsBuilder()
+                .append(id, user.id)
+                .append(type, user.type)
+                .append(status, user.status)
+                .append(username, user.username)
+                .append(password, user.password)
+                .append(salt, user.salt)
+                .append(email, user.email)
+                .append(activationCode, user.activationCode)
+                .append(headerUrl, user.headerUrl)
+                .append(createTime, user.createTime)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(username)
+                .append(password)
+                .append(salt)
+                .append(email)
+                .append(type)
+                .append(status)
+                .append(activationCode)
+                .append(headerUrl)
+                .append(createTime)
+                .toHashCode();
+    }
 }

@@ -57,4 +57,13 @@ public class HomeController {
         return "/index";
     }
 
+    /**
+     * 跳转异常处理错误页面
+     * @return
+     */
+    @GetMapping("/error")
+    public String getErrorPage(){
+        return "/error/500";
+    }
+
 }

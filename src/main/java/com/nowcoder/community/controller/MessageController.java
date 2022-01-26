@@ -7,8 +7,6 @@ import com.nowcoder.community.service.MessageService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import org.springframework.aop.aspectj.annotation.MetadataAwareAspectInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.rmi.MarshalException;
 import java.util.*;
 
 /**
@@ -171,6 +168,9 @@ public class MessageController {
         if(target == null){
             return CommunityUtil.getJSONString(1,"目标用户不存在！");
         }
+        if(target.equals(hostHolder.getUser())){
+            return CommunityUtil.getJSONString(1,"不能给自己发私信！");
+        }
         // 构造消息
         Message message = new Message();
         message.setFromId(hostHolder.getUser().getId()); // 设置当前用户
@@ -186,6 +186,18 @@ public class MessageController {
         messageService.addMessage(message);
 
         // 成功返回状态0
+        return CommunityUtil.getJSONString(0);
+    }
+
+    /**
+     * 删除消息
+     * @param id
+     * @return
+     */
+    @PostMapping("letter/delete")
+    @ResponseBody
+    public String deleteLetter(int id){
+        messageService.deleteMessage(id);
         return CommunityUtil.getJSONString(0);
     }
 }
