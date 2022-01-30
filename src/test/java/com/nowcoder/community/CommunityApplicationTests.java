@@ -5,6 +5,7 @@ import com.nowcoder.community.util.SensitiveFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -17,6 +18,8 @@ class CommunityApplicationTests {
     private TemplateEngine templateEngine;
     @Autowired
     private SensitiveFilter sensitiveFilter;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Test
     void testMailSend() {
@@ -40,6 +43,27 @@ class CommunityApplicationTests {
         text1 = sensitiveFilter.filter(text1);
         System.out.println(text);
         System.out.println(text1);
+    }
+
+    @Test
+    public void redisTest(){
+        String key = "test:count";
+
+        redisTemplate.opsForValue().set(key,1);
+        Object o = redisTemplate.opsForValue().get(key);
+        Object o1 = redisTemplate.opsForValue().get("111");
+        System.out.println(o1);
+        Integer res = (Integer) o1;
+        System.out.println(res);
+
+
+//        String key1 = "test:set";
+//        redisTemplate.opsForSet().add(key1,222);
+//        Long size = redisTemplate.opsForSet().size(key);
+//        long count = size;
+//        System.out.println(size);
+//        System.out.println(count);
+
     }
 
 }
