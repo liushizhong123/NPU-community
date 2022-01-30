@@ -1,8 +1,9 @@
 package com.nowcoder.community.service;
 
-import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.entity.LoginTicket;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,8 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginTicketService {
 
+//    @Autowired
+//    private LoginTicketMapper loginTicketMapper;
     @Autowired
-    private LoginTicketMapper loginTicketMapper;
+    private RedisTemplate redisTemplate;
 
     /**
      * 通过ticket查询LoginTicket对象
@@ -22,6 +25,7 @@ public class LoginTicketService {
      * @return
      */
     public LoginTicket findLoginTicket(String ticket) {
-        return loginTicketMapper.selectByTicket(ticket);
+        String redisKey = RedisKeyUtil.getTicketKey(ticket);
+        return (LoginTicket) redisTemplate.opsForValue().get(redisKey);
     }
 }

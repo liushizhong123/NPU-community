@@ -18,7 +18,7 @@
         values (#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})
     </insert>
 
-    <!--  分页查询评论 -->
+    <!--  通过实体分页查询评论 -->
     <select id="selectCommentsByEntity" resultType="com.nowcoder.community.entity.Comment">
         select <include refid="selectFields"></include>
         from comment
@@ -28,7 +28,7 @@
         order by create_time asc
         limit  #{offset}, #{limit}
     </select>
-<!--  查询评论数量 -->
+<!--  通过实体查询评论数量 -->
     <select id="selectCountByEntity" resultType="java.lang.Integer">
         select count(id)
         from comment
@@ -36,4 +36,28 @@
         and entity_type = #{entityType}
         and entity_id = #{entityId}
     </select>
+<!--    通过用户查询对帖子的评论集 -->
+    <select id="selectCommentsByUser" resultType="com.nowcoder.community.entity.Comment">
+        select <include refid="selectFields"></include>
+        from comment
+        where status != 1
+        and user_id = #{userId}
+        and entity_type = 1
+        and exists (
+        select id from discuss_post where id = comment.entity_id and status != 2
+        )
+        order by create_time desc
+        limit #{offset}, #{limit}
+    </select>
+<!--    查询用户对帖子的评论数量 -->
+    <select id="selectCountByUser" resultType="java.lang.Integer">
+        select count(id) from comment
+        where status != 1
+        and user_id = #{userId}
+        and entity_type = 1
+        and exists (
+            select id from discuss_post where id = comment.entity_id and status != 2
+        )
+    </select>
+
 </mapper>

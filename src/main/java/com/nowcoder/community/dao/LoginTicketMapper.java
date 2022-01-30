@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.*;
  * 此处通过注解实现sql
  * */
 @Mapper
+@Deprecated // 不推荐使用了
 public interface LoginTicketMapper {
 
     @Insert({

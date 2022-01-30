@@ -35,4 +35,20 @@ public interface CommentMapper {
      * @return
      */
     int insertComment(Comment comment);
+
+    /**
+     * 查询用户的评论数量
+     * @param userId
+     * @return
+     */
+    int selectCountByUser(int userId);
+
+    /**
+     * 查询用户的评论集
+     * @param userId
+     * @param offset
+     * @param limit
+     * @return
+     */
+    List<Comment> selectCommentsByUser(@Param("userId") int userId, @Param("offset") int offset, @Param("limit") int limit);
 }
