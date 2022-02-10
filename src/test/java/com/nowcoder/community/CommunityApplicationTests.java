@@ -27,7 +27,7 @@ class CommunityApplicationTests {
     }
 
     @Test
-    public void testHtmlMail(){ // 尝试发送HTML邮件
+    public void testHtmlMail() { // 尝试发送HTML邮件
         Context context = new Context(); // thymeleaf 的 Context
         context.setVariable("username", "Jame Liu");
         String content = templateEngine.process("/mail/demo", context); // 生成动态网页
@@ -36,7 +36,7 @@ class CommunityApplicationTests {
     }
 
     @Test
-    public void testSensitiveFilter(){
+    public void testSensitiveFilter() {
         String text = "这里可以赌博，把那个开票，嫖娼，哈哈哈！！！";
         String text1 = "这里￥￥￥￥可以&&赌&&博&&，把****那个…………开%%房，---嫖###娼--，哈哈哈！！！";
         text = sensitiveFilter.filter(text);
@@ -46,10 +46,10 @@ class CommunityApplicationTests {
     }
 
     @Test
-    public void redisTest(){
+    public void redisTest() {
         String key = "test:count";
 
-        redisTemplate.opsForValue().set(key,1);
+        redisTemplate.opsForValue().set(key, 1);
         Object o = redisTemplate.opsForValue().get(key);
         Object o1 = redisTemplate.opsForValue().get("111");
         System.out.println(o1);
@@ -65,5 +65,4 @@ class CommunityApplicationTests {
 //        System.out.println(count);
 
     }
-
 }
