@@ -106,4 +106,46 @@ public class MessageService {
         // 更新消息状态为删除状态
         return messageMapper.updateStatus(Arrays.asList(new Integer[]{id}), 2);
     }
+
+    /**
+     * 查询某个主题下最新的通知
+     * @param userId
+     * @param topic
+     * @return
+     */
+    public Message findLatestNotice(int userId,String topic){
+        return messageMapper.selectLatestNotice(userId,topic);
+    }
+
+    /**
+     * 查询某个主题下的所包含的通知的数量
+     * @param userId
+     * @param topic
+     * @return
+     */
+    public int findNoticeCount(int userId,String topic){
+        return messageMapper.selectNoticeCount(userId,topic);
+    }
+
+    /**
+     * 查询某个主题下未读的消息的数量
+     * @param userId
+     * @param topic
+     * @return
+     */
+    public int findNoticeUnreadCount(int userId,String topic){
+        return messageMapper.selectNoticeUnreadCount(userId,topic);
+    }
+
+    /**
+     * 分页查询某个主题下的所有通知
+     * @param userId
+     * @param topic
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public List<Message> findNotices(int userId,String topic,int offset,int limit){
+        return messageMapper.selectNotices(userId,topic,offset,limit);
+    }
 }

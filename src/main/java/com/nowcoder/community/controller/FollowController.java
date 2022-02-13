@@ -1,8 +1,10 @@
 package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
+import com.nowcoder.community.entity.Event;
 import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.event.EventProducer;
 import com.nowcoder.community.service.FollowService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
@@ -29,12 +31,12 @@ public class FollowController implements CommunityConstant {
 
     @Autowired
     private FollowService followService;
-
     @Autowired
     private HostHolder hostHolder;
-
     @Autowired
     private UserService userService;
+    @Autowired
+    private EventProducer eventProducer;
 
     @PostMapping("/follow")
     @ResponseBody
@@ -42,8 +44,17 @@ public class FollowController implements CommunityConstant {
     public String follow(int entityId,int entityType){
         // 获取当前用户
         User user = hostHolder.getUser();
-        // 点赞
+        // 关注
         followService.follow(user.getId(),entityId,entityType);
+        // 触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityId(entityId)
+                .setEntityType(entityType)
+                .setEntityUserId(entityId);
+        // 发布事件
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJSONString(0,"已关注！");
     }
@@ -54,7 +65,7 @@ public class FollowController implements CommunityConstant {
     public String unfollow(int entityId,int entityType){
         // 获取当前用户
         User user = hostHolder.getUser();
-        // 点赞
+        // 取消关注
         followService.unfollow(user.getId(),entityId,entityType);
 
         return CommunityUtil.getJSONString(0,"已取消关注！");

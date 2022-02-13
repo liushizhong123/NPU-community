@@ -51,4 +51,11 @@ public interface CommentMapper {
      * @return
      */
     List<Comment> selectCommentsByUser(@Param("userId") int userId, @Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 根据id查询评论信息
+     * @param id
+     * @return
+     */
+    Comment selectCommentById(int id);
 }
