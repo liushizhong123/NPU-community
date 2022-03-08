@@ -9,8 +9,10 @@ import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.apache.catalina.Host;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +37,8 @@ public class CommentController implements CommunityConstant {
     private EventProducer eventProducer;
     @Autowired
     private DiscussPostService discussPostService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 添加帖子评论
@@ -69,6 +73,12 @@ public class CommentController implements CommunityConstant {
 
         // 发布事件
         eventProducer.fireEvent(event);
+        // 对帖子评论才把帖子 id 存入 redis
+        if(comment.getEntityType() == ENTITY_TYPE_POST){
+            // 将帖子id存入redis,以便之后计算帖子的分数
+            String redisKey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(redisKey,discussPostId);
+        }
 
         // 跳转到帖子详情页
         return "redirect:/discuss/detail/" + discussPostId;

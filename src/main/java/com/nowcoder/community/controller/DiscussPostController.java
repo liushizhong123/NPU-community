@@ -12,7 +12,9 @@ import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,8 @@ public class DiscussPostController implements CommunityConstant {
     private CommentService commentService;
     @Autowired
     private LikeService likeService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     /**
@@ -60,6 +64,10 @@ public class DiscussPostController implements CommunityConstant {
         post.setContent(content);
         post.setCreateTime(new Date());
         discussPostService.addDiscussPost(post);
+
+        // 将帖子id存入redis,以便之后计算帖子的分数
+        String redisKey = RedisKeyUtil.getPostScoreKey();
+        redisTemplate.opsForSet().add(redisKey,post.getId());
 
         // 报错的情况将来统一处理
         return CommunityUtil.getJSONString(0, "发布成功！");
@@ -163,5 +171,52 @@ public class DiscussPostController implements CommunityConstant {
         model.addAttribute("comments", commentVoList);
 
         return "site/discuss-detail";
+    }
+
+
+    /**
+     * 置顶帖子
+     * @param id
+     * @return
+     */
+    @PostMapping("/top")
+    @ResponseBody
+    public String setTop(int id){
+        discussPostService.updateType(id,1);
+
+        // 返回响应码，异步请求
+        return CommunityUtil.getJSONString(0);
+    }
+
+    /**
+     * 加精帖子
+     * @param id
+     * @return
+     */
+    @PostMapping("/wonderful")
+    @ResponseBody
+    public String setWonderful(int id){
+        discussPostService.updateStatus(id,1);
+
+        // 将帖子 id 存入redis,以便之后计算帖子的分数
+        String redisKey = RedisKeyUtil.getPostScoreKey();
+        redisTemplate.opsForSet().add(redisKey,id);
+
+        // 返回响应码，异步请求
+        return CommunityUtil.getJSONString(0);
+    }
+
+    /**
+     * 删除帖子
+     * @param id
+     * @return
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public String setDelete(int id){
+        discussPostService.updateStatus(id,2);
+
+        // 返回响应码，异步请求
+        return CommunityUtil.getJSONString(0);
     }
 }

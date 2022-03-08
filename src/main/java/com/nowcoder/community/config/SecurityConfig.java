@@ -2,10 +2,10 @@ package com.nowcoder.community.config;
 
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -22,6 +22,7 @@ import java.io.PrintWriter;
  * @Date 2022/3/4 14:34
  * @Version 1.0
  */
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements CommunityConstant {
 
     @Override
@@ -66,6 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                         AUTHORITY_ADMIN
                 )
                 .anyRequest().permitAll()
+                // 禁止csrf
                 .and().csrf().disable();
 
         // 权限不够时的处理
@@ -99,6 +101,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                     }
                 });
 
+        // 将登录框验证关闭
+        http.formLogin().disable();
         // Security底层默认会拦截/logout请求,进行退出处理.
         // 覆盖它默认的逻辑,才能执行我们自己的退出代码.
         http.logout().logoutUrl("/securitylogout");

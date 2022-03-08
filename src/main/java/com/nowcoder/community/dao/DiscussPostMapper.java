@@ -16,7 +16,7 @@ public interface DiscussPostMapper {
      * @param limit
      * @return
      */
-    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit);
+    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit,int orderMode);
 
     // @Param注解用于给参数取别名,
     // 如果只有一个参数,并且在<if>里使用,则必须加别名.
@@ -44,4 +44,28 @@ public interface DiscussPostMapper {
      */
     int updateCommentCount(@Param("id") int id, @Param("commentCount") int commentCount);
 
+    /**
+     * 更新帖子类型
+     * @param id
+     * @param type
+     * @return
+     */
+    int updateType(@Param("id") int id, @Param("type") int type);
+
+    /**
+     * 更新帖子状态
+     * @param id
+     * @param status
+     * @return
+     */
+    int updateStatus(@Param("id") int id, @Param("status") int status);
+
+
+    /**
+     * 更新帖子分数
+     * @param id
+     * @param score
+     * @return
+     */
+    int updateScore(@Param("id") Integer id, @Param("score") double score);
 }

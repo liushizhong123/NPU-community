@@ -4,6 +4,9 @@ import com.nowcoder.community.util.MailClient;
 import com.nowcoder.community.util.SensitiveFilter;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Test;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +30,9 @@ class CommunityApplicationTests {
 
     @Autowired
     private Producer producer;
+
+    @Autowired
+    private Scheduler scheduler;
 
     @Test
     void testMailSend() {
@@ -81,6 +87,16 @@ class CommunityApplicationTests {
         try {
             Thread.sleep(1000*10);
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteJob(){
+        try {
+            boolean res = scheduler.deleteJob(new JobKey("alphaJob", "alphaJobGroup"));
+            System.out.println(res);
+        } catch (SchedulerException e) {
             e.printStackTrace();
         }
     }

@@ -3,10 +3,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+<!--	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>-->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
-	<title>牛客网-首页</title>
+	<title>NPU论坛-首页</title>
 </head>
 <body>	
 	<div class="nk-container">
@@ -16,7 +16,7 @@
 				<!-- 导航 -->
 				<nav class="navbar navbar-expand-lg navbar-dark">
 					<!-- logo -->
-					<a class="navbar-brand" href="#"></a>
+<!--					<a>NPU</a>-->
 					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span class="navbar-toggler-icon"></span>
 					</button>
@@ -48,6 +48,7 @@
 								</div>
 							</li>
 						</ul>
+
 						<!-- 搜索 -->
 						<form class="form-inline my-2 my-lg-0" action="site/search.html">
 							<input class="form-control mr-sm-2" type="search" aria-label="Search" />
@@ -65,14 +66,15 @@
 					<!-- 筛选条件 -->
 					<ul class="nav nav-tabs mb-3">
 						<li class="nav-item">
-							<a class="nav-link active" href="#">最新</a>
+							<a th:class="|nav-link ${orderMode==0?'active':''}|" th:href="@{/index(orderMode=0)}">最新</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="#">最热</a>
+							<a th:class="|nav-link ${orderMode==1?'active':''}|" th:href="@{/index(orderMode=1)}">最热</a>
 						</li>
 					</ul>
 					<button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#publishModal" th:if="${loginUser != null}">我要发布</button>
 				</div>
+
 				<!-- 弹出框 -->
 				<div class="modal fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg" role="document">
@@ -102,6 +104,7 @@
 						</div>
 					</div>
 				</div>
+
 				<!-- 提示框 -->
 				<div class="modal fade" id="hintModal" tabindex="-1" role="dialog" aria-labelledby="hintModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg" role="document">
@@ -115,7 +118,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<!-- 帖子列表 -->
 				<ul class="list-unstyled">
 					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="map:${discussPosts}">
@@ -141,6 +144,7 @@
 						</div>						
 					</li>
 				</ul>
+
 				<!-- 分页 -->
 				<nav class="mt-5" th:if="${page.rows>0}" th:fragment="pagination">
 					<ul class="pagination justify-content-center">
@@ -204,13 +208,13 @@
 							<div class="col">
 								<ul class="nav btn-group-vertical company-info">
 									<li class="nav-item text-white-50">
-										公司地址：北京市朝阳区大屯路东金泉时代3-2708北京牛客科技有限公司
+										社区地址：陕西省西安市长安区西北工业大学计算机学院
 									</li>
 									<li class="nav-item text-white-50">
-										联系方式：010-60728802(电话)&nbsp;&nbsp;&nbsp;&nbsp;admin@nowcoder.com
+										联系方式：18406595545&nbsp;&nbsp;&nbsp;&nbsp;18406595545@163.com
 									</li>
 									<li class="nav-item text-white-50">
-										牛客科技©2018 All rights reserved
+										NPU科技©2020 All rights reserved
 									</li>
 									<li class="nav-item text-white-50">
 										京ICP备14055008号-4 &nbsp;&nbsp;&nbsp;&nbsp;

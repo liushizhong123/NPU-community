@@ -1,7 +1,5 @@
 package com.nowcoder.community.service;
 
-import com.nowcoder.community.CommunityApplication;
-import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
@@ -13,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.thymeleaf.TemplateEngine;
@@ -253,6 +252,10 @@ public class UserService implements CommunityConstant {
             map.put("newPasswordMsg","新密码不能为空！");
             return map;
         }
+        if(oldPassword.equals(newPassword)){
+            map.put("newPasswordMsg","新密码不能与原始密码一致！");
+            return map;
+        }
         if(StringUtils.isBlank(confirmPassword)){
             map.put("confirmPasswordMsg","确认密码不能为空！");
             return map;
@@ -261,6 +264,7 @@ public class UserService implements CommunityConstant {
             map.put("confirmPasswordMsg","两次输入的新密码不相同！");
             return map;
         }
+
 
         // 验证原始密码
         User user = userMapper.selectById(userId);
@@ -331,5 +335,31 @@ public class UserService implements CommunityConstant {
     private void clearCache(int userId){
         String redisKey = RedisKeyUtil.getUserKey(userId);
         redisTemplate.delete(redisKey);
+    }
+
+    /**
+     * 获取用户权限
+     * @param userId
+     * @return
+     */
+    public Collection<? extends GrantedAuthority> getAuthorities(int userId) {
+        User user = this.findUserById(userId);
+
+        List<GrantedAuthority> list = new ArrayList<>();
+        list.add(new GrantedAuthority() {
+
+            @Override
+            public String getAuthority() {
+                switch (user.getType()) {
+                    case 1:
+                        return AUTHORITY_ADMIN;
+                    case 2:
+                        return AUTHORITY_MODERATOR;
+                    default:
+                        return AUTHORITY_USER;
+                }
+            }
+        });
+        return list;
     }
 }
