@@ -42,9 +42,9 @@ public class SensitiveFilter {
      * 这个 Bean即 SensitiveFilter 在程序启动时就实例化,
      * 然后调用构造器,之后这个方法就会被调用.
      * this.getClass().getClassLoader() : 类加载器是从类路径下加载资源, 也就是 target/classes
-     * 在 getResourceAsStream("sensitive-words.txt") 直接写文件名即可
+     * 在 getResourceAsStream("sensitive-words.txt") 直接写文件名即可 默认是从classpath下加载
      */
-    @PostConstruct
+    @PostConstruct //  被注解的方法，在对象加载完依赖注入后执行
     public void init(){
         try(
                 // 初始化输入流，并将其转换为缓冲流

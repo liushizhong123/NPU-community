@@ -3,10 +3,7 @@ package com.nowcoder.community.controller;
 import com.google.code.kaptcha.Producer;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
-import com.nowcoder.community.util.CommunityConstant;
-import com.nowcoder.community.util.CommunityUtil;
-import com.nowcoder.community.util.MailClient;
-import com.nowcoder.community.util.RedisKeyUtil;
+import com.nowcoder.community.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,7 @@ import org.thymeleaf.context.Context;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
@@ -227,28 +225,39 @@ public class LoginController implements CommunityConstant {
     }
 
     /**
-     * 获取验证码
+     * 获取忘记密码验证码
      * @param email
-     * @param session
+     * @param response
      * @return
      */
     @GetMapping("/forget/code")
     @ResponseBody
-    public String getForgetCode(String email, HttpSession session) {
+    public String getForgetCode(String email,HttpServletResponse response) {
         if (StringUtils.isBlank(email)) {
             return CommunityUtil.getJSONString(1, "邮箱不能为空！");
         }
 
-        // 发送邮件
+        // 发送邮件内容
         Context context = new Context();
         context.setVariable("email", email);
+        // 产生一个四位的随机验证码
         String code = CommunityUtil.generateUUID().substring(0, 4);
         context.setVariable("verifyCode", code);
+        // 填充内容
         String content = templateEngine.process("/mail/forget", context);
         mailClient.sendMail(email, "找回密码", content);
 
-        // 保存验证码
-        session.setAttribute("verifyCode", code);
+        // Redis 保存验证码
+//        session.setAttribute("verifyCode", code);
+        String key = "verifyCode";
+        String codeId = CommunityUtil.generateUUID().substring(0, 4);
+        Cookie cookie = new Cookie(key, codeId);
+        cookie.setPath(contextPath); // 设置有限范围: 整个项目cookie都有效
+        cookie.setMaxAge(90); // 设置有效时间
+        response.addCookie(cookie); // 提交cookie给服务器
+        String redisKey = RedisKeyUtil.getForgetCodeKey(codeId);
+        // 设置过期时间90s
+        redisTemplate.opsForValue().set(redisKey,code,90,TimeUnit.SECONDS);
 
         return CommunityUtil.getJSONString(0);
     }
@@ -259,15 +268,20 @@ public class LoginController implements CommunityConstant {
      * @param verifyCode
      * @param password
      * @param model
-     * @param session
+     * @param request
      * @return
      */
     @PostMapping(value = "/forget/password")
-    public String resetPassword(String email, String verifyCode, String password, Model model, HttpSession session) {
-        String code = (String) session.getAttribute("verifyCode"); // 获取验证码
-        if (StringUtils.isBlank(verifyCode) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(verifyCode)) {
-            model.addAttribute("codeMsg", "验证码错误!");
-            return "/site/forget";
+    public String resetPassword(String email, String verifyCode, String password, Model model, HttpServletRequest request) {
+        String key = "verifyCode";
+        String codeId = CookieUtil.getValue(request,key);
+        if(codeId != null) {
+            String redisKey = RedisKeyUtil.getForgetCodeKey(codeId);
+            String code = (String) redisTemplate.opsForValue().get(redisKey); // 获取验证码
+            if (StringUtils.isBlank(verifyCode) || StringUtils.isBlank(code) || !code.equalsIgnoreCase(verifyCode)) {
+                model.addAttribute("codeMsg", "验证码错误!");
+                return "/site/forget";
+            }
         }
 
         Map<String, Object> map = userService.resetPassword(email, password);

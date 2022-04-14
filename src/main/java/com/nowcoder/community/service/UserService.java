@@ -44,8 +44,12 @@ public class UserService implements CommunityConstant {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
+    /**
+     * 获取用户信息，首先从redis中取，取不到从数据库中取，并更新缓存
+     * @param id 用户id
+     * @return
+     */
     public User findUserById(int id) {
-//        return userMapper.selectById(id);
         User user = getCache(id);
         if (user == null) {
             user = initCache(id);
@@ -194,12 +198,12 @@ public class UserService implements CommunityConstant {
         loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000)); // 现在的时间加上过期时间（毫秒）
 //        // 存入登录凭证到数据库
 //        loginTicketMapper.insertLoginTicket(loginTicket);
-        // 存入redis
+        // 登入凭证存入redis
         String redisKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
         redisTemplate.opsForValue().set(redisKey,loginTicket);
 
         // 浏览器只需要存 ticket, 通过它可以查询到登录凭证即可
-        map.put("ticket", loginTicket.getTicket());
+        map.put("ticket", loginTicket.getId());
         return map;
     }
 
@@ -209,10 +213,11 @@ public class UserService implements CommunityConstant {
      */
     public void logout(String ticket) {
 //       loginTicketMapper.updateStatus(ticket,1);
-        // 更改登入凭证的状态
+        // 更改redis中登入凭证的状态
         String redisKey = RedisKeyUtil.getTicketKey(ticket);
         LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(redisKey);
         loginTicket.setStatus(1);
+        // 存回redis 用于判断登入
         redisTemplate.opsForValue().set(redisKey,loginTicket);
     }
 
@@ -267,7 +272,7 @@ public class UserService implements CommunityConstant {
 
 
         // 验证原始密码
-        User user = userMapper.selectById(userId);
+        User user = findUserById(userId);
         oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
         if (!user.getPassword().equals(oldPassword)) {
             map.put("oldPasswordMsg", "原始密码输入有误!");
@@ -276,6 +281,7 @@ public class UserService implements CommunityConstant {
 
         // 更新密码
         newPassword = CommunityUtil.md5(newPassword + user.getSalt());
+        // 更新数据库，删除缓存
         userMapper.updatePassword(userId, newPassword);
         clearCache(userId);
 
@@ -310,7 +316,9 @@ public class UserService implements CommunityConstant {
 
         // 重置密码
         password = CommunityUtil.md5(password + user.getSalt());
+        // 1.先更新数据库
         userMapper.updatePassword(user.getId(), password);
+        // 2.删除缓存
         clearCache(user.getId());
 
         map.put("user", user);
@@ -323,7 +331,7 @@ public class UserService implements CommunityConstant {
         return (User) redisTemplate.opsForValue().get(redisKey);
     }
 
-    // 2. 取不到值时初始化缓存
+    // 2. 取不到值时从数据库中读取值，初始化缓存，并返回数据
     private User initCache(int userId){
         User user = userMapper.selectById(userId);
         String redisKey = RedisKeyUtil.getUserKey(userId);

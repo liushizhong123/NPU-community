@@ -6,7 +6,9 @@ import com.nowcoder.community.service.LoginTicketService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CookieUtil;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 /**
- * 登录拦截器
+ * 登录拦截器，用于显示登入信息
  *
  * @author lsz on 2022/1/15
  */
@@ -36,27 +38,32 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 在Controller之前执行
      * 在请求之前将user暂存到hostHolder
      * @param request
      * @param response
-     * @param handler
+     * @param handler 拦截目标 是 controller方法
      * @return
      * @throws Exception
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        // 从cookie获取登录凭证
+        // 从 cookie 获取登录凭证
         String ticket = CookieUtil.getValue(request, "ticket");
         if(ticket != null){
-            // 查询凭证
-            LoginTicket loginTicket = loginTicketService.findLoginTicket(ticket);
+            String redisKey = RedisKeyUtil.getTicketKey(ticket);
+            // 从redis中查询凭证
+            LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(redisKey);
             // 判断凭证是否有效
             if(loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())){
+                // 查询获得当前用户
                 User user = userService.findUserById(loginTicket.getUserId());
-                // 本次请求持有用户
+                // 本次请求持有用户,考虑多线程并发
                 hostHolder.setUser(user);
 
                 // 保存认证结果，并存入SecurityContext 以便Security进行授权

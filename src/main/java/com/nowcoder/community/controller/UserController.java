@@ -99,7 +99,7 @@ public class UserController implements CommunityConstant {
         // 通过图片的后缀名来判断图片格式
         String fileName = headerImage.getOriginalFilename(); // 获得原始文件名
         String suffix = fileName.substring(fileName.lastIndexOf(".")); // 获得文件后缀名
-        if (StringUtils.isBlank(suffix)) {
+        if (StringUtils.isBlank(suffix)) { // 文件后缀名为空
             model.addAttribute("error", "文件格式不正确！");
             return "site/setting";
         }
@@ -126,7 +126,7 @@ public class UserController implements CommunityConstant {
     }
 
     /**
-     * 返回用户头像
+     * 获取用户头像
      * 对应上文的 headerUrl
      * @param fileName 文件名
      * @param response 响应流-输出到浏览器
@@ -139,8 +139,8 @@ public class UserController implements CommunityConstant {
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         // 设置响应格式为图片
         response.setContentType("image/" + suffix); // 固定写法
-        FileInputStream fis = null;
-        OutputStream os = null;
+        FileInputStream fis = null; // 文件输入流
+        OutputStream os = null; // 文件输出流
         try {
             // 输入字节流
             fis = new FileInputStream(fileName);
@@ -158,6 +158,7 @@ public class UserController implements CommunityConstant {
         } catch (IOException e) {
             logger.error("读取文件失败：", e.getMessage());
         }finally {
+            // 关闭输入流
             if(fis != null){
                 try {
                     fis.close();
@@ -165,6 +166,7 @@ public class UserController implements CommunityConstant {
                     e.printStackTrace();
                 }
             }
+            // 关闭输出流
             if(os != null){
                 try {
                     os.close();

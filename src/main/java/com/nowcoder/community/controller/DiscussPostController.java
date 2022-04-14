@@ -59,10 +59,10 @@ public class DiscussPostController implements CommunityConstant {
         }
         // 创建帖子并插入
         DiscussPost post = new DiscussPost();
-        post.setUserId(user.getId());
-        post.setTitle(title);
-        post.setContent(content);
-        post.setCreateTime(new Date());
+        post.setUserId(user.getId()); // 用户id
+        post.setTitle(title); // 标题
+        post.setContent(content); // 内容
+        post.setCreateTime(new Date()); // 创建时间
         discussPostService.addDiscussPost(post);
 
         // 将帖子id存入redis,以便之后计算帖子的分数

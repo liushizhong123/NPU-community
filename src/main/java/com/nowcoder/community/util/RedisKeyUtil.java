@@ -32,6 +32,8 @@ public class RedisKeyUtil {
 
     /* 验证码 */
     private static final String PREFIX_KAPTCHA = "kaptcha";
+    /*  忘记密码验证码 */
+    private static final String PREFIX_Code = "forgetCode";
 
     /* 凭证 */
     private static final String PREFIX_TICKET = "ticket";
@@ -96,6 +98,16 @@ public class RedisKeyUtil {
      */
     public static String getKaptchaKey(String owner) {
         return PREFIX_KAPTCHA + SPLIT + owner;
+    }
+
+    /**
+     * 登录验证码
+     *
+     * @param verifyCode 服务器发给客户端的验证码
+     * @return
+     */
+    public static String getForgetCodeKey(String verifyCode) {
+        return PREFIX_Code + SPLIT + verifyCode;
     }
 
     /**

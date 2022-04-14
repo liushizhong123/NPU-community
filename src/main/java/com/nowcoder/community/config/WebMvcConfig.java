@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
-    private LoginTicketInterceptor loginTicketInterceptor;
+    private LoginTicketInterceptor loginTicketInterceptor; // 登录用户信息拦截器
 
     @Autowired
     private LoginRequiredInterceptor loginRequiredInterceptor;
