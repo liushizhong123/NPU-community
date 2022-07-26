@@ -51,8 +51,9 @@ public class LikeService {
                     operations.opsForSet().remove(entityLikeKey,userId);
                     operations.opsForValue().decrement(userLikeKey);
                 }else {
-                    // 点赞
+                    // 更新点赞集合
                     operations.opsForSet().add(entityLikeKey,userId);
+                    // 用户得到的赞，即对其评论与帖子赞的总和
                     operations.opsForValue().increment(userLikeKey);
                 }
                 return operations.exec();

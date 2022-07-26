@@ -40,7 +40,7 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
 
     private static final Date epoch;
 
-
+    // 静态初始化，整个运行过程中只初始化一次
     static {
         try {
             epoch = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2014-08-01 00:00:00");
@@ -64,6 +64,7 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
         logger.info("[任务开始] 正在刷新帖子分数：" + boundSetOperations.size());
         // 遍历集合执行任务
         while(boundSetOperations.size() > 0){
+            // 每次更新一个帖子都是pop出来，防止重复计算，同时节省内存
             this.refresh((Integer)boundSetOperations.pop());
         }
 
@@ -99,5 +100,10 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
                 + (discussPost.getCreateTime().getTime() - epoch.getTime()) / (1000 * 3600 * 24);
         // 更新帖子分数
         discussPostService.updateScore(postId,score);
+        // 更新缓存
+        String key = RedisKeyUtil.getHOTKey();
+        // 先删除
+        redisTemplate.opsForZSet().remove(key,discussPost);
+        redisTemplate.opsForZSet().add(key,discussPost,score);
     }
 }

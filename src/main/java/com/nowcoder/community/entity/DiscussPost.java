@@ -1,5 +1,8 @@
 package com.nowcoder.community.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Date;
 
 public class DiscussPost {
@@ -99,5 +102,21 @@ public class DiscussPost {
                 ", commentCount=" + commentCount +
                 ", score=" + score +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DiscussPost post = (DiscussPost) o;
+
+        return new EqualsBuilder().append(id, post.id).append(userId, post.userId).append(type, post.type).append(createTime, post.createTime).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(id).append(userId).append(type).append(createTime).toHashCode();
     }
 }

@@ -1,15 +1,10 @@
 package com.nowcoder.community.config;
 
-import com.nowcoder.community.interceptor.DataInterceptor;
-import com.nowcoder.community.interceptor.LoginRequiredInterceptor;
-import com.nowcoder.community.interceptor.LoginTicketInterceptor;
-import com.nowcoder.community.interceptor.MessageInterceptor;
+import com.nowcoder.community.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 拦截器配置
@@ -22,8 +17,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private LoginTicketInterceptor loginTicketInterceptor; // 登录用户信息拦截器
 
+//    @Autowired
+//    private LoginRequiredInterceptor loginRequiredInterceptor;
+
     @Autowired
-    private LoginRequiredInterceptor loginRequiredInterceptor;
+    private AccessLimitInterceptor accessLimitInterceptor;
 
     @Autowired
     private MessageInterceptor messageInterceptor;
@@ -37,7 +35,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginTicketInterceptor) //注入登录信息拦截器
                 .excludePathPatterns("/*/*.css", "/*/*.js", "/*/*.png", "/*/*.jpg", "/*/*.jpeg"); // 排除静态资源
 
-//        registry.addInterceptor(loginRequiredInterceptor) //注入登录状态拦截器
+        registry.addInterceptor(accessLimitInterceptor) // 接口防刷拦截器
+                .excludePathPatterns("/*/*.css", "/*/*.js", "/*/*.png", "/*/*.jpg", "/*/*.jpeg");
+
+//        registry.addInterceptor(loginRequiredInterceptor) //注入登录状态拦截器,（不在使用）由spring security 负责
 //                .excludePathPatterns("/*/*.css", "/*/*.js", "/*/*.png", "/*/*.jpg", "/*/*.jpeg"); // 排除静态资源
 
         registry.addInterceptor(messageInterceptor) //注入未读消息拦截器

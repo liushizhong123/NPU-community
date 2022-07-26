@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,7 @@ import java.io.PrintWriter;
  *
  * @author lsz on 2022/1/22
  */
-@ControllerAdvice(annotations = Controller.class) // 声明作用范围
+@ControllerAdvice(annotations = {Controller.class, RestController.class}) // 声明作用范围
 public class ExceptionAdvice {
 
     /**

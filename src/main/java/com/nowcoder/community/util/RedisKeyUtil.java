@@ -46,6 +46,10 @@ public class RedisKeyUtil {
 
     private static final String PREFIX_POST = "post";
 
+    private static final String REPEAT_NUM = "repeat";
+
+    private static final String PREFIX_HOT = "hot";
+
     /**
      * 某个实体的赞
      * 实体: 包括帖子和评论
@@ -181,4 +185,16 @@ public class RedisKeyUtil {
         return PREFIX_POST + SPLIT + "score";
     }
 
+    public static String getHOTKey() {
+        return PREFIX_HOT + SPLIT + "hot";
+    }
+
+    /**
+     * 接口刷新url
+     * @param url
+     * @return
+     */
+    public static String getRepeatNumKey(String url,String IP){
+        return REPEAT_NUM + SPLIT + url + SPLIT + IP;
+    }
 }

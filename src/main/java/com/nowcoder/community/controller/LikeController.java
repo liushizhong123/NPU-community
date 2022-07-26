@@ -1,6 +1,5 @@
 package com.nowcoder.community.controller;
 
-import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.Event;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.event.EventProducer;
@@ -41,7 +40,6 @@ public class LikeController implements CommunityConstant {
      * @param entityId
      * @return
      */
-    @LoginRequired
     @PostMapping("/like")
     @ResponseBody
     public String like(int entityType,int entityId,int entityUserId,int postId){
@@ -60,6 +58,7 @@ public class LikeController implements CommunityConstant {
 
         // 触发点赞事件：点赞则触发，取消赞不触发
         if(likeStatus == 1){
+            // 构造 Event
             Event event = new Event()
                     .setTopic(TOPIC_LIKE)
                     .setUserId(hostHolder.getUser().getId())

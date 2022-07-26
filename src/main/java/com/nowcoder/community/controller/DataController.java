@@ -27,7 +27,7 @@ public class DataController {
 
 
     /**
-     * 统计页面
+     * 跳转统计页面
      * @return
      */
     @RequestMapping(value = "/data",method = {RequestMethod.GET,RequestMethod.POST})

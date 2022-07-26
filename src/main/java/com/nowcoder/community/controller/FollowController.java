@@ -40,7 +40,6 @@ public class FollowController implements CommunityConstant {
 
     @PostMapping("/follow")
     @ResponseBody
-    @LoginRequired
     public String follow(int entityId,int entityType){
         // 获取当前用户
         User user = hostHolder.getUser();
@@ -61,7 +60,6 @@ public class FollowController implements CommunityConstant {
 
     @PostMapping("/unfollow")
     @ResponseBody
-    @LoginRequired
     public String unfollow(int entityId,int entityType){
         // 获取当前用户
         User user = hostHolder.getUser();

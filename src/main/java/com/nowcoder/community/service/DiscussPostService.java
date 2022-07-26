@@ -2,12 +2,17 @@ package com.nowcoder.community.service;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.util.RedisKeyUtil;
 import com.nowcoder.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.annotation.PostConstruct;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DiscussPostService {
@@ -18,6 +23,22 @@ public class DiscussPostService {
     @Autowired
     private SensitiveFilter sensitiveFilter;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @PostConstruct
+    public void init(){
+        // 初始化所有的帖子
+        String key = RedisKeyUtil.getHOTKey();
+        List<DiscussPost> discussPostList = discussPostMapper.selectAllDiscussPosts();
+        // 装入redis
+        if(discussPostList != null){
+            for(DiscussPost post : discussPostList){
+                redisTemplate.opsForZSet().add(key,post,post.getScore());
+            }
+        }
+    }
+
     /**
      * 分页获取帖子
      * @param userId
@@ -26,6 +47,20 @@ public class DiscussPostService {
      * @return
      */
     public List<DiscussPost> findDiscussPosts(int userId, int offset, int limit,int orderMode) {
+        // 从 redis 获取
+        String key = RedisKeyUtil.getHOTKey();
+        if(userId == 0 && orderMode == 1){ // 查询热帖
+            Set<DiscussPost> discussPostSet = redisTemplate.opsForZSet().reverseRange(key, offset, limit + offset - 1);
+            if(discussPostSet != null){
+                List<DiscussPost> discussPostList = new LinkedList<>();
+                for(DiscussPost post : discussPostSet){
+                    discussPostList.add(post);
+                }
+                return discussPostList;
+            }
+            throw new IllegalArgumentException("参数不合法！");
+        }
+        // 这里的 orderMode  用于热帖排行榜,为 0 时最新帖子， 为 1 时是最热帖子，两种帖子排序方式不同
         return discussPostMapper.selectDiscussPosts(userId, offset, limit,orderMode);
     }
 

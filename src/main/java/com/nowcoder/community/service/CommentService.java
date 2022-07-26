@@ -1,7 +1,6 @@
 package com.nowcoder.community.service;
 
 import com.nowcoder.community.dao.CommentMapper;
-import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.entity.Comment;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.SensitiveFilter;

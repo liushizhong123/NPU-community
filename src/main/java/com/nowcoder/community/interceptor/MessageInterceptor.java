@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 消息数量拦截器
+ * 消息数量拦截器，每次查询当前用户的未读消息（私信 + 通知）数量
  *
  * @author lsz on 2022/2/13
  */
@@ -25,6 +25,14 @@ public class MessageInterceptor implements HandlerInterceptor {
     @Autowired
     private MessageService messageService;
 
+    /**
+     * 在模板返回之前，在Controller之后执行
+     * @param request
+     * @param response
+     * @param handler
+     * @param modelAndView
+     * @throws Exception
+     */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         User user = hostHolder.getUser(); // 获取当前用户

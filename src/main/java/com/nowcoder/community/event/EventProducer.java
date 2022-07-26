@@ -22,6 +22,8 @@ public class EventProducer {
      * @param event 封装的事件
      */
    public void fireEvent(Event event){
+       // 将事件发送到指定的主题
+       // 消息是一个 json 字符串
        kafkaTemplate.send(event.getTopic(), JSONObject.toJSONString(event));
    }
 }

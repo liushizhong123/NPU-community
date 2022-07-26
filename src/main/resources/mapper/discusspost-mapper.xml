@@ -73,4 +73,11 @@
         where id = #{id}
     </select>
 
+<!--    查询所有帖子  -->
+    <select id="selectAllDiscussPosts" resultType="com.nowcoder.community.entity.DiscussPost">
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where status != 2
+    </select>
+
 </mapper>

@@ -1,6 +1,5 @@
 package com.nowcoder.community.controller;
 
-import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.Comment;
 import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.Page;
@@ -75,7 +74,6 @@ public class UserController implements CommunityConstant {
      * 跳转用户页
      * @return
      */
-    @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage(Model model){
         return "/site/setting";
@@ -87,7 +85,6 @@ public class UserController implements CommunityConstant {
      * @param model
      * @return
      */
-    @LoginRequired
     @PostMapping("/upload")
     public String uploadHeader(MultipartFile headerImage, Model model) {
         // 判断有没有图片

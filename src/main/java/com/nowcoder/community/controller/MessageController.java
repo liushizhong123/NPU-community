@@ -206,14 +206,21 @@ public class MessageController implements CommunityConstant {
         return CommunityUtil.getJSONString(0);
     }
 
+    /**
+     * 查询通知列表
+     * @param model
+     * @return
+     */
     @GetMapping(value = "/notice/list")
     public String getNoticeList(Model model){
         User user = hostHolder.getUser();
-        //查询评论类通知
+        // 查询评论类通知
         Message message = messageService.findLatestNotice(user.getId(),TOPIC_COMMENT);
         // 判空处理
         if(message != null){
+            // 页面展示对象
             Map<String,Object> messageVo = new HashMap<>(16);
+            // 将消息传入
             messageVo.put("message",message);
             // 去掉转义字符，得到json格式的字符串
             String content = HtmlUtils.htmlUnescape(message.getContent());
@@ -224,9 +231,10 @@ public class MessageController implements CommunityConstant {
             messageVo.put("entityId",data.get("entityId"));// 评论的目标实体id
             messageVo.put("postId",data.get("postId"));// 评论的目标实体所在的帖子
 
+            // 消息总数量
             int count = messageService.findNoticeCount(user.getId(),TOPIC_COMMENT);
             messageVo.put("count",count);
-
+            // 未读消息数量
             int unread = messageService.findNoticeUnreadCount(user.getId(),TOPIC_COMMENT);
             messageVo.put("unread",unread);
             model.addAttribute("commentNotice",messageVo);
@@ -304,7 +312,7 @@ public class MessageController implements CommunityConstant {
         page.setRows(messageService.findNoticeCount(user.getId(),topic));
         // 通知信息列表
         List<Message> noticeList = messageService.findNotices(user.getId(),topic,page.getOffset(),page.getLimit());
-        // 模板模型
+        // 页面展示对象
         List<Map<String,Object>> noticeVoList = new ArrayList<>();
         if(noticeList != null){
             Map<String,Object> map = new HashMap<>(16);
@@ -317,8 +325,8 @@ public class MessageController implements CommunityConstant {
                 map.put("user",userService.findUserById((Integer) data.get("userId"))); // 发起用户
                 map.put("entityType",data.get("entityType")); // 目标类型
                 map.put("entityId",data.get("entityId")); // 目标类型id
-                map.put("postId",data.get("postId"));// 帖子id
-                // 通知的作者
+                map.put("postId",data.get("postId"));// 帖子id，当通知为关注时，为空值
+                // 通知的作者，就是系统用户
                 map.put("fromUser",userService.findUserById(notice.getFromId()));
 
                 noticeVoList.add(map);

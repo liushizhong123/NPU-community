@@ -67,6 +67,7 @@ public class DiscussPostController implements CommunityConstant {
 
         // 将帖子id存入redis,以便之后计算帖子的分数
         String redisKey = RedisKeyUtil.getPostScoreKey();
+        // 使用集合存储，天然去重
         redisTemplate.opsForSet().add(redisKey,post.getId());
 
         // 报错的情况将来统一处理

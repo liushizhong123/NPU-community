@@ -47,7 +47,6 @@ public class CommentController implements CommunityConstant {
      * @return
      */
     @PostMapping(value = "/add/{discussPostId}")
-    @LoginRequired
     public String addComment(@PathVariable("discussPostId") int discussPostId,
                              Comment comment){
         comment.setUserId(hostHolder.getUser().getId());
@@ -63,6 +62,7 @@ public class CommentController implements CommunityConstant {
                 .setEntityId(comment.getEntityId()) // 评论目标的id
                 .setEntityType(comment.getEntityType()) // 评论目标的类型
                 .setData("posId",discussPostId); // 帖子id,便于查询帖子详情
+        // 评论目标不同无法直接设置，需要单独查询
         if(comment.getEntityType() == ENTITY_TYPE_POST){// 查询帖子信息
             DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
@@ -73,6 +73,7 @@ public class CommentController implements CommunityConstant {
 
         // 发布事件
         eventProducer.fireEvent(event);
+
         // 对帖子评论才把帖子 id 存入 redis
         if(comment.getEntityType() == ENTITY_TYPE_POST){
             // 将帖子id存入redis,以便之后计算帖子的分数

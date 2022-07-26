@@ -1,6 +1,7 @@
 package com.nowcoder.community.controller;
 
 import com.google.code.kaptcha.Producer;
+import com.nowcoder.community.annotation.AccessLimit;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.*;
@@ -138,6 +139,7 @@ public class LoginController implements CommunityConstant {
      * 生成验证码
      * @param response
      */
+    @AccessLimit(second=5,maxCount=5,needLogin=false)
     @GetMapping(value = "/kaptcha")
     public void getKaptcha(HttpServletResponse response){
         // 生成验证码
@@ -196,7 +198,7 @@ public class LoginController implements CommunityConstant {
         }
         // 2 检查账号，密码
         int expiredSeconds = rememberme ? REMEMBER_EXPIRED_SECONDS : DEFAULT_EXPIRED_SECONDS; // 设置超时时间
-        // 登录, 凭证录入数据库中, 返回 <"ticket", ticket凭证字符串对象>
+        // 登录
         Map<String, Object> map = userService.login(username, password, expiredSeconds);
         String key = "ticket";
         // 若map里包含ticket，则登录成功，跳转到首页页面

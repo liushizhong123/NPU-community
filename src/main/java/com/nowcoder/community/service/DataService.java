@@ -1,7 +1,6 @@
 package com.nowcoder.community.service;
 
 import com.nowcoder.community.util.RedisKeyUtil;
-import org.apache.ibatis.javassist.Loader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
 /**
  * @Author liushizhong
@@ -50,11 +48,13 @@ public class DataService {
         List<String> keyList = new ArrayList<>();
         // 日期计算
         Calendar calendar = Calendar.getInstance();
+        // 设置当前时间
         calendar.setTime(start);
+        // 遍历日期
         while(!calendar.getTime().after(end)){
             String uvKey = RedisKeyUtil.getUVKey(dateFormat.format(calendar.getTime()));
             keyList.add(uvKey);
-            // 日期加一天
+            // 日期加一天，循环变量加1
             calendar.add(Calendar.DATE,1);
 
         }
@@ -71,7 +71,7 @@ public class DataService {
     public void recordDAU(int userId){
         // 构造 key
         String redisKey = RedisKeyUtil.getDAUKey(dateFormat.format(new Date()));
-        // 加入redis
+        // 加入redis，标志其活跃
         redisTemplate.opsForValue().setBit(redisKey,userId,true);
     }
 
@@ -90,19 +90,21 @@ public class DataService {
         calendar.setTime(start);
         while(!calendar.getTime().after(end)){
             String key = RedisKeyUtil.getDAUKey(dateFormat.format(calendar.getTime()));
+            // byte数组
             keyList.add(key.getBytes());
             // 日期加一天
             calendar.add(Calendar.DATE,1);
-
         }
-        // 进行OR运算
+        // 进行OR运算，调用底层连接实现运算
         return (long) redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 // 构造结果的key
                 String redisKey = RedisKeyUtil.getDAUKey(dateFormat.format(start),dateFormat.format(end));
+                // 进行bitOp运算，计算一段时间的日活跃用户数目
                 connection.bitOp(RedisStringCommands.BitOperation.OR,
                         redisKey.getBytes(),keyList.toArray(new byte[0][0]));
+                // 返回结果
                 return connection.bitCount(redisKey.getBytes());
             }
         });

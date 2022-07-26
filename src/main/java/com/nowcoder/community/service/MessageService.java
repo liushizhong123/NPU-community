@@ -80,7 +80,7 @@ public class MessageService {
      * @return
      */
     public int addMessage(Message message){
-        // 过滤消息内容
+        // 过滤消息内容，防止xss攻击
         message.setContent(HtmlUtils.htmlEscape(message.getContent()));
         message.setContent(sensitiveFilter.filter(message.getContent()));
 

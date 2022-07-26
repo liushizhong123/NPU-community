@@ -203,7 +203,7 @@ public class UserService implements CommunityConstant {
         redisTemplate.opsForValue().set(redisKey,loginTicket);
 
         // 浏览器只需要存 ticket, 通过它可以查询到登录凭证即可
-        map.put("ticket", loginTicket.getId());
+        map.put("ticket", loginTicket.getTicket());
         return map;
     }
 

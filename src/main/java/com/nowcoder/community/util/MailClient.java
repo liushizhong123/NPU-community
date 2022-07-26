@@ -24,7 +24,7 @@ public class MailClient {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username}") // 从配置文件导入用户名
     private String from;
 
     /**

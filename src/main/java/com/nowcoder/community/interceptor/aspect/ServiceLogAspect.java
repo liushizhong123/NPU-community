@@ -1,4 +1,4 @@
-package com.nowcoder.community.aspect;
+package com.nowcoder.community.interceptor.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

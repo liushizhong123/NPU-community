@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -29,8 +30,12 @@ public class EventConsumer implements CommunityConstant {
     @Autowired
     private MessageService messageService;
 
+    /**
+     * 消费消息
+     * @param record 消息实体
+     */
     @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW})
-    public void handleCommentMessage(ConsumerRecord record) {
+    public void handleCommentMessage(ConsumerRecord record, Acknowledgment ack) { // ConsumerRecord 是一个map
         if(record == null || record.value() == null){
             logger.error("消息的内容为空！");
             return;
@@ -49,10 +54,11 @@ public class EventConsumer implements CommunityConstant {
         message.setCreateTime(new Date());
 
         Map<String, Object> content = new HashMap<>(16);
-        content.put("userId", event.getUserId());
-        content.put("entityType", event.getEntityType());
-        content.put("entityId", event.getEntityId());
+        content.put("userId", event.getUserId()); //  事件触发者
+        content.put("entityType", event.getEntityType()); // 目标实体类型
+        content.put("entityId", event.getEntityId()); // 目标实体 id
 
+        // 目标实体相关其他信息，也放入内容中
         if (!event.getData().isEmpty()) {
             for (Map.Entry<String, Object> entry : event.getData().entrySet()) {
                 content.put(entry.getKey(), entry.getValue());
@@ -62,5 +68,8 @@ public class EventConsumer implements CommunityConstant {
         // 转换为json字符串
         message.setContent(JSONObject.toJSONString(content));
         messageService.addMessage(message);
+
+        // 手动提交offset，防止消息丢失
+        ack.acknowledge();
     }
 }

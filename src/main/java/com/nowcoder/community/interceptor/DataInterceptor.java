@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  * @Version 1.0
  */
 @Component
-public class DataInterceptor implements HandlerInterceptor {
+public class DataInterceptor implements HandlerInterceptor { // 统计UV与DAU拦截器
 
     @Autowired
     private DataService dataService;
@@ -31,10 +31,10 @@ public class DataInterceptor implements HandlerInterceptor {
         dataService.recordUV(ip);
         // 统计DAU
         User user = hostHolder.getUser();
-        if(user!= null){
+        if(user!= null){ // 用户必须登入才算
             dataService.recordDAU(user.getId());
         }
-
+        // 放开执行
         return true;
     }
 }

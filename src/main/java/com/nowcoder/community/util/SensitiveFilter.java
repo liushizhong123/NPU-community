@@ -23,7 +23,7 @@ import java.util.Map;
 public class SensitiveFilter {
 
     /**
-     * 日志
+     * 记录日志
      */
     private static final Logger logger = LoggerFactory.getLogger(SensitiveFilter.class);
 
@@ -49,7 +49,7 @@ public class SensitiveFilter {
         try(
                 // 初始化输入流，并将其转换为缓冲流
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
-                // 此处体现了装饰器模式
+                // 此处体现了装饰器，适配器模式
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 ){
             String keyword;
@@ -61,18 +61,17 @@ public class SensitiveFilter {
         }catch (IOException e){
             logger.error("加载敏感词文件失败:" + e.getMessage());
         }
-
-
     }
 
     /**
      * 添加敏感词字符到前缀树
      * @param keyword 敏感词
      */
-    private void addKeyword(String keyword) {
+    private void  addKeyword(String keyword) {
         TrieNode tempNode = rootNode; // 相当于指针，开始指向根节点
         for(int i = 0;i < keyword.length();i++){
             char c = keyword.charAt(i);
+            // 得到子节点
             TrieNode subNode = tempNode.getSubNode(c);
             // 没有这个子节点
             if(subNode == null){
@@ -136,7 +135,7 @@ public class SensitiveFilter {
             if (tempNode == null) { // 下级没有结点
                 // 以begin开头的字符串不是敏感词
                 sb.append(text.charAt(begin));
-                // 进入下一个位置
+                // 进入下一个位置,指针2 3同时后移
                 position = ++begin;
                 // 归位: 重新指向根节点
                 tempNode = rootNode;
