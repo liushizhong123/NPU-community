@@ -2,7 +2,9 @@ package com.nowcoder.community.controller;
 
 import com.google.code.kaptcha.Producer;
 import com.nowcoder.community.annotation.AccessLimit;
+import com.nowcoder.community.entity.Event;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.event.EventProducer;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +56,9 @@ public class LoginController implements CommunityConstant {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private EventProducer eventProducer;
 
     // 打印日志
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -201,8 +206,17 @@ public class LoginController implements CommunityConstant {
         // 登录
         Map<String, Object> map = userService.login(username, password, expiredSeconds);
         String key = "ticket";
+        String key1 = "user";
         // 若map里包含ticket，则登录成功，跳转到首页页面
         if (map.containsKey(key)) {
+            // 触发事件
+            Event event = new Event().setTopic(TOPIC_LOGIN)
+                    .setLogId(CommunityUtil.generateUUID().substring(0,4))
+                    .setUserId(((User) map.get(key1)).getId())
+                    .setData("username",((User) map.get(key1)).getUsername())
+                    .setData("email",((User) map.get(key1)).getEmail());
+            // 发送消息
+            eventProducer.fireEvent(event);
             // 创建 cookie 给前端
             Cookie cookie = new Cookie(key, map.get(key).toString());
             cookie.setPath(contextPath); // 设置有限范围: 整个项目cookie都有效
